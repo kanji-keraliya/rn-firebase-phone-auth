@@ -6,68 +6,69 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  SafeAreaView,
   StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
+  Button,
+  TextInput
 } from 'react-native';
+import auth from '@react-native-firebase/auth';
 
 import {
-  Header,
-  LearnMoreLinks,
   Colors,
-  DebugInstructions,
-  ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
 const App: () => React$Node = () => {
+  // If null, no SMS has been sent
+  const [confirm, setConfirm] = useState(null);
+
+  const [code, setCode] = useState('');
+  const [phone, setPhone] = useState('+1 650-555-3434');
+
+  // Handle the button press
+  async function signInWithPhoneNumber(phoneNumber) {
+    try {
+      const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
+      console.log('confirmation', confirmation);
+      setConfirm(confirmation);
+      alert('OTP sent successfully');
+    } catch (e) {
+      alert('Error' + e.message);
+    }
+  }
+
+  async function confirmCode() {
+    try {
+      const result = await confirm.confirm(code);
+      console.log('Valid code.', result);
+      alert('Verified Successfully');
+    } catch (error) {
+      alert('Invalid code.');
+      console.log('Invalid code.');
+    }
+  }
+
+  if (!confirm) {
+    return (
+      <>
+        <TextInput value={phone} placeholder="Phone" onChangeText={text => setPhone(text)} />
+        <Button
+          title="Phone Number Sign In"
+          onPress={() => {
+            if (phone)
+              signInWithPhoneNumber(phone);
+            else
+              alert('Enter Phone')
+          }}
+        />
+      </>
+    );
+  }
+
   return (
     <>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
+      <TextInput value={code} placeholder="Code" onChangeText={text => setCode(text)} />
+      <Button title="Confirm Code" onPress={() => confirmCode()} />
     </>
   );
 };

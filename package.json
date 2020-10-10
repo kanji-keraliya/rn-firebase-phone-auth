@@ -1,6 +1,6 @@
 {
   "name": "RNFirebaseAuth",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -10,6 +10,8 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@react-native-firebase/app": "^8.4.5",
+    "@react-native-firebase/auth": "^9.3.0",
     "react": "16.13.1",
     "react-native": "0.63.3"
   },
